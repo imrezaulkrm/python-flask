@@ -1,0 +1,53 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('source code pull from github') {
+            steps {
+                git branch: 'main', url: 'https://github.com/imrezaulkrm/python-jenkins.git'
+            }
+        }
+
+        stage('build number tag') {
+            steps {
+                sh '''BUILD_NUMBER="${BUILD_NUMBER}"
+                    IMAGE_NAME="imrezaulkrm/python:$BUILD_NUMBER"
+                    docker build -t $IMAGE_NAME .
+                    docker run -d -p 5010:5000 $IMAGE_NAME'''
+            }
+        }
+
+        stage('todays date tag') {
+            steps {
+                sh '''TODAYS_DATE=$(date "+%Y%m%d")
+                    IMAGE_NAME1="imrezaulkrm/python:$TODAYS_DATE"
+                    docker build -t $IMAGE_NAME1 .
+                    docker run -d -p 5020:5000 $IMAGE_NAME1'''
+            }
+        }
+
+        stage('just latest tag') {
+            steps {
+                sh '''docker build -t imrezaulkrm/python:latest .
+                    docker run -d -p 5030:5000 imrezaulkrm/python:latest'''
+            }
+        }
+
+        stage('Hello') {
+            steps {
+                sh '''docker login -u imrezaulkrm -p Rezaul@thenos
+                    docker push $IMAGE_NAME
+                    docker push $IMAGE_NAME1
+                    docker push imrezaulkrm/python:latest'''
+            }
+        }
+    }
+
+    post {
+        success {
+            // Stop and remove containers
+            sh 'docker stop $IMAGE_NAME $IMAGE_NAME1 imrezaulkrm/python:latest'
+            sh 'docker rm $IMAGE_NAME $IMAGE_NAME1 imrezaulkrm/python:latest'
+        }
+    }
+}
