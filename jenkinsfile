@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('source code pull from github') {
             steps {
-                git branch: 'main', url: 'https://github.com/imrezaulkrm/python-jenkins.git'
+                git branch: 'main', url: 'https://github.com/imrezaulkrm/python-flask.git'
             }
         }
 
