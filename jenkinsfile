@@ -33,7 +33,7 @@ pipeline {
             }
         }
 
-        stage('Hello') {
+        stage('dockerhub push') {
             steps {
                 sh '''docker login -u imrezaulkrm -p Rezaul@thenos
                     docker push $IMAGE_NAME
